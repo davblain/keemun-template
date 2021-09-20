@@ -5,14 +5,9 @@
     <vendor>davblain</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.android</depends>
 
-    <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceImplementation="com.github.davblain.keemuntemplate.services.MyApplicationService"/>
-        <projectService serviceImplementation="com.github.davblain.keemuntemplate.services.MyProjectService"/>
+    <extensions defaultExtensionNs="com.android.tools.idea.wizard.template">
+        <wizardTemplateProvider implementation="com.github.davblain.keemuntemplate.WizardTemplateProviderImpl" />
     </extensions>
-
-    <applicationListeners>
-        <listener class="com.github.davblain.keemuntemplate.listeners.MyProjectManagerListener"
-                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
-    </applicationListeners>
 </idea-plugin>

@@ -19,6 +19,7 @@ plugins {
 group = properties("pluginGroup")
 version = properties("pluginVersion")
 
+val androidStudioPath: String by project
 // Configure project's dependencies
 repositories {
     mavenCentral()
@@ -27,13 +28,15 @@ repositories {
 // Configure Gradle IntelliJ Plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
 intellij {
     pluginName.set(properties("pluginName"))
-    version.set(properties("platformVersion"))
-    type.set(properties("platformType"))
     downloadSources.set(properties("platformDownloadSources").toBoolean())
     updateSinceUntilBuild.set(true)
-
+    //version.set(properties("platformVersion"))
+    // type.set(properties("platformType"))
+    localPath.set(androidStudioPath)
     // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
-    plugins.set(properties("platformPlugins").split(',').map(String::trim).filter(String::isNotEmpty))
+    plugins.set(
+        properties("platformPlugins").split(',').map(String::trim).filter(String::isNotEmpty)
+    )
 }
 
 // Configure Gradle Changelog Plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
@@ -65,7 +68,12 @@ tasks {
     wrapper {
         gradleVersion = properties("gradleVersion")
     }
-
+    instrumentCode {
+        enabled = false
+    }
+    postInstrumentCode {
+        enabled = false
+    }
     patchPluginXml {
         version.set(properties("pluginVersion"))
         sinceBuild.set(properties("pluginSinceBuild"))
@@ -93,7 +101,10 @@ tasks {
     }
 
     runPluginVerifier {
-        ideVersions.set(properties("pluginVerifierIdeVersions").split(',').map(String::trim).filter(String::isNotEmpty))
+        ideVersions.set(
+            properties("pluginVerifierIdeVersions").split(',').map(String::trim)
+                .filter(String::isNotEmpty)
+        )
     }
 
     // Configure UI tests plugin
@@ -104,7 +115,9 @@ tasks {
         systemProperty("jb.privacy.policy.text", "<!--999.999-->")
         systemProperty("jb.consents.confirmation.enabled", "false")
     }
-
+    buildSearchableOptions {
+        enabled = false
+    }
     signPlugin {
         certificateChain.set(System.getenv("CERTIFICATE_CHAIN"))
         privateKey.set(System.getenv("PRIVATE_KEY"))
@@ -117,6 +130,7 @@ tasks {
         // pluginVersion is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
         // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
         // https://plugins.jetbrains.com/docs/intellij/deployment.html#specifying-a-release-channel
-        channels.set(listOf(properties("pluginVersion").split('-').getOrElse(1) { "default" }.split('.').first()))
+        channels.set(listOf(properties("pluginVersion").split('-').getOrElse(1) { "default" }
+            .split('.').first()))
     }
 }
