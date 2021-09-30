@@ -2,7 +2,6 @@ package com.github.davblain.keemuntemplate.templates
 
 import com.android.tools.idea.wizard.template.*
 import com.android.tools.idea.wizard.template.impl.defaultPackageNameParameter
-import com.android.tools.idea.wizard.template.impl.invisibleSourceProviderNameParameter
 
 private fun featureParamsName(entityName: String): String = "${entityName}FeatureParams"
 private fun featureState(entityName: String): String = "${entityName}State"
@@ -92,23 +91,23 @@ fun updaterFile(
     fun ${featureUpdaterConstructor(entityName)}: ${featureUpdateType(entityName)} {
         val internalUpdater = internalUpdater()
         val externalUpdater = externalUpdater()
-        return ${featureUpdateType(entityName)} { msg, model ->
+        return ${featureUpdateType(entityName)} { msg, state ->
             when (msg) {
-                is ${subTypeFeatureMsg(MsgType.External, entityName)} -> externalUpdater(msg, model)
-                is ${subTypeFeatureMsg(MsgType.Internal, entityName)} -> internalUpdater(msg, model)
+                is ${subTypeFeatureMsg(MsgType.External, entityName)} -> externalUpdater(msg, state)
+                is ${subTypeFeatureMsg(MsgType.Internal, entityName)} -> internalUpdater(msg, state)
             }
         }
     }
     
-    ${subUpdaterConstruction(MsgType.Internal, entityName)}
+    private ${subUpdaterConstruction(MsgType.Internal, entityName)}
     
-    ${subUpdaterConstruction(MsgType.External, entityName)}
+    private ${subUpdaterConstruction(MsgType.External, entityName)}
     
     /** Сайд-эффекты. */
     sealed class ${featureEffect(entityName)}
     
     /** Внешние сообщения. */
-    sealed class ${subTypeFeatureMsg(MsgType.External, entityName)}
+    sealed class ${subTypeFeatureMsg(MsgType.External, entityName)}:${featureMsg(entityName)}()
     
 """.trimIndent()
 
@@ -127,7 +126,7 @@ fun effectHandlerFile(packageName: String, entityName: String): String = """
     }
     
     /** Внутренние сообщения. */
-    sealed class ${subTypeFeatureMsg(MsgType.Internal, entityName)}
+    sealed class ${subTypeFeatureMsg(MsgType.Internal, entityName)}:${featureMsg(entityName)}()
     
 """.trimIndent()
 
